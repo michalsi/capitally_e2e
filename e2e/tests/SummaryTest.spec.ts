@@ -3,7 +3,7 @@ import {expect} from "@playwright/test";
 import {StartTrialPage} from "../pages/StartTrialPage";
 
 
-test('Summary Page tests', async ({testContext}) => {
+test('Verif Summary page and redirection to free trial', async ({testContext}) => {
         const {summaryPage, startTrialPage} = testContext
         const {START_TRIAL_TEXT} = StartTrialPage;
 

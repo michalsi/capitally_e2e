@@ -34,18 +34,6 @@ export class SummaryPage extends BasePage {
         await expect(this.upcomingEstimatedIncome).toBeVisible()
     }
 
-    async changeBenchmark() {
-        await this.page.locator('[id="headlessui-combobox-button-\\:r8f\\:"] svg').click();
-        await this.page.getByRole('option', { name: 'MSCI World MSCIWORLD' }).getByRole('img').click();
-
-        // await this.page.getByTitle(fromBenchmark).click();
-        // await this.page.getByTitle(toBenchmark).click();
-    }
-
-    async verifyCompareToBenchmarkTextContains(text: string) {
-        return await expect(this.page.locator('#AppRoot')).toContainText('Compared to' + text);
-    }
-
     async clickStartFreeTrial(){
         await this.startFreeTrialButton.click()
         await this.page.waitForSelector(`h1:text("${StartTrialPage.START_TRIAL_TEXT}")`);

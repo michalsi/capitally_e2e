@@ -4,8 +4,6 @@ export class BasePage {
     protected page: Page;
     protected url: string;
     acceptAllButton: Locator;
-    static readonly  S_P_TEXT: string = 'S&P';
-    static readonly MSCI_WORLD_TEXT: string = 'MSCI World';
 
     constructor(page: Page, url: string) {
         this.page = page;
