@@ -1,14 +1,14 @@
 import {expect, Locator, Page} from '@playwright/test';
-import { BasePage } from './BasePage';
+import {BasePage} from './BasePage';
 
 export class PortfolioPage extends BasePage {
-    totalReturnsLink: Locator = this.page.getByRole('link', { name: 'Total Returns' });
-    incomeLink: Locator = this.page.getByRole('link', { name: /Income/ });
-    feesLink: Locator = this.page.getByRole('link', { name: /Fees/ });
-    taxDueLink: Locator = this.page.getByRole('link', { name: /Tax Due/ });
-    accountsTab: Locator = this.page.getByText('Accounts', { exact: true });
-    assetsTab: Locator = this.page.getByText('Assets', { exact: true });
-    transactionsTab: Locator = this.page.getByText('Transactions', { exact: true });
+    totalReturnsLink: Locator = this.page.getByRole('link', {name: 'Total Returns'});
+    incomeLink: Locator = this.page.getByRole('link', {name: /Income/});
+    feesLink: Locator = this.page.getByRole('link', {name: /Fees/});
+    taxDueLink: Locator = this.page.getByRole('link', {name: /Tax Due/});
+    accountsTab: Locator = this.page.getByText('Accounts', {exact: true});
+    assetsTab: Locator = this.page.getByText('Assets', {exact: true});
+    transactionsTab: Locator = this.page.getByText('Transactions', {exact: true});
 
     typesLink: Locator = this.page.getByText('Types');
     currenciesLink: Locator = this.page.getByText('Currencies');
@@ -25,17 +25,21 @@ export class PortfolioPage extends BasePage {
     retirementLink: Locator = this.page.getByText('Retirement');
     stocksLink: Locator = this.page.getByText('Stocks');
     withIncomeLink: Locator = this.page.getByText('With Income');
-    rateOfReturnLink: Locator = this.page.getByRole('link', { name: 'Rate of Return (MWR)' });
+    rateOfReturnLink: Locator = this.page.getByRole('link', {name: 'Rate of Return (MWR)'});
 
-    addAssetButton: Locator = this.page.getByRole('button', { name: 'Add Asset' });
-    assetCombobox: Locator = this.page.getByRole('combobox', { name: "Enter asset's name, SYMBOL or" });
+    addAssetButton: Locator = this.page.getByRole('button', {name: 'Add Asset'});
+    assetCombobox: Locator = this.page.getByRole('combobox', {name: "Enter asset's name, SYMBOL or"});
     addAssetDialog: Locator = this.page.getByText('This is a Demo projectDemo');
-    okButton: Locator = this.page.getByRole('button', { name: 'OK' });
+    okButton: Locator = this.page.getByRole('button', {name: 'OK'});
 
-    static readonly PORTFOLIO_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+    searchBox: Locator = this.page.getByRole('textbox', {name: 'Type here to search the table'});
+
+
+
+    readonly url = '/demo-1/explorer';
 
     constructor(page: Page) {
-        super(page, PortfolioPage.PORTFOLIO_PAGE_URL);
+        super(page);
     }
 
     async clickLiquidAssets() {
@@ -99,36 +103,47 @@ export class PortfolioPage extends BasePage {
     async clickAccounts() {
         await this.accountsTab.click();
     }
+
     async clickPositions() {
         await this.positionsLink.click()
     }
+
     async clickAssets() {
         await this.assetsTab.click();
     }
+
     async clickTransactions() {
         await this.transactionsTab.click();
     }
+
     async clickTypes() {
         await this.typesLink.click();
     }
+
     async clickTags() {
         await this.tagsLink.click();
     }
+
     async clickCurrencies() {
         await this.currenciesLink.click();
     }
+
     async clickMarkets() {
         await this.marketsLink.click();
     }
+
     async clickCategories() {
         await this.categoriesLink.click();
     }
+
     async clickRegions() {
         await this.regionsLink.click();
     }
+
     async clickSectors() {
         await this.sectorsLink.click();
     }
+
     // Method to click through all lower menu items
     async clickThroughAllLowerMenuItems() {
         await this.clickAccounts();
@@ -148,19 +163,27 @@ export class PortfolioPage extends BasePage {
         await this.addAssetButton.click();
     }
 
-    async addAsset(assetName: string, assetNameToWait:string) {
+    async addAsset(assetName: string, assetNameToWait: string) {
         await this.addAssetButton.click();
         await this.assetCombobox.click();
         await this.assetCombobox.fill(assetName);
-        await expect(this.page.getByRole('option', { name: assetNameToWait })).toBeVisible();
+        await expect(this.page.getByRole('option', {name: assetNameToWait})).toBeVisible();
         await this.assetCombobox.press('Enter');
     }
 
-    getAddAssetDemoDialog(){
+    getAddAssetDemoDialog() {
         return this.addAssetDialog
     }
-     async closeAddAssetDemoDialog(){
-         await this.okButton.click();
 
-     }
+    async closeAddAssetDemoDialog() {
+        await this.okButton.click();
+
+    }
+
+    async openPositionDetails(positionName: string) {
+        await this.searchBox.fill(positionName);
+        await this.searchBox.press('Enter');
+        await this.page.getByRole('link', {name: positionName}).click()
+    }
+
 }

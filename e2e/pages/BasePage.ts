@@ -1,21 +1,22 @@
 import {Locator, Page} from '@playwright/test'
 
-export class BasePage {
+export abstract class BasePage {
     protected page: Page;
-    protected url: string;
+readonly BASE_URL = 'https://app.mycapitally.com/project';
+    readonly abstract url: string;
     acceptAllButton: Locator;
 
-    constructor(page: Page, url: string) {
+    protected constructor(page: Page) {
         this.page = page;
-        this.url = url
         this.acceptAllButton = this.page.getByRole('button', { name: 'Accept all' });
     }
 
     async navigate() {
-        await this.page.goto(this.url);
+        await this.page.goto(this.BASE_URL + this.url);
     }
 
     async acceptCookies(){
         await this.acceptAllButton.click()
     }
 }
+

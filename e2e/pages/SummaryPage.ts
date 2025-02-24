@@ -14,10 +14,10 @@ export class SummaryPage extends BasePage {
     topBenchmarkChanges: Locator = this.page.getByText('Top benchmark changes')
     investmentIncome: Locator = this.page.getByRole('link', {name: 'Investment Income in past year'})
     upcomingEstimatedIncome: Locator = this.page.getByRole('link', {name: 'Upcoming and estimated Income'})
-    static readonly SUMMARY_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+    readonly url = '/demo-1/summary';
 
     constructor(page: Page) {
-        super(page, SummaryPage.SUMMARY_PAGE_URL)
+        super(page)
     }
 
     async verifyElements() {
