@@ -1,0 +1,239 @@
+File Name: fixtures.ts, Path: e2e/fixtures.ts
+Content:
+```
+import {test as base} from '@playwright/test'
+
+import {SummaryPage} from './pages/SummaryPage';
+import {PageObjects} from './pages/pageObjects'
+import {StartTrialPage} from "./pages/StartTrialPage";
+import {PortfolioPage} from "./pages/PortfolioPage";
+
+export const test = base.extend<{
+    testContext: PageObjects
+}>({
+    testContext: async ({page}, use) => {
+        const testContext: PageObjects = {
+            summaryPage: new SummaryPage(page),
+            startTrialPage: new StartTrialPage(page),
+            portfolioPage: new PortfolioPage(page)
+        }
+        acceptCookies()
+        await use(testContext)
+    },
+
+})
+
+```
+----------------------------------------
+File Name: SummaryTest.spec.ts, Path: e2e/tests/SummaryTest.spec.ts
+Content:
+```
+import {test} from '../fixtures'
+import {expect} from "@playwright/test";
+import {StartTrialPage} from "../pages/StartTrialPage";
+
+
+test('Verif Summary page and redirection to free trial', async ({testContext}) => {
+        const {summaryPage, startTrialPage} = testContext
+        const {START_TRIAL_TEXT} = StartTrialPage;
+
+        await summaryPage.navigate();
+        await summaryPage.acceptCookies();
+        await summaryPage.verifyElements();
+        await summaryPage.clickStartFreeTrial()
+        const headerText = await startTrialPage.getStartTrialHeaderText();
+
+        expect(headerText).toContain(START_TRIAL_TEXT);
+    }
+)
+
+```
+----------------------------------------
+File Name: PortfolioTest.spec.ts, Path: e2e/tests/PortfolioTest.spec.ts
+Content:
+```
+import {test} from "../fixtures";
+
+test("Portfolio test", async ({testContext}) => {
+        const {portfolioPage} = testContext
+        await portfolioPage.navigate()
+        await portfolioPage.clickOnEverything()
+    }
+)
+```
+----------------------------------------
+File Name: PortfolioPage.ts, Path: e2e/pages/PortfolioPage.ts
+Content:
+```
+import {expect, Page} from '@playwright/test';
+import {BasePage} from "./BasePage";
+
+export class PortfolioPage extends BasePage {
+    portfolioLink: any;
+    marketValueLink: any;
+    totalReturnsLink: any;
+    incomeLink: any;
+    feesLink: any;
+    taxDueLink: any;
+    accountsTab: any;
+    assetsTab: any;
+    transactionsTab: any;
+
+    static readonly PORTFOLIO_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+
+
+    constructor(page: Page) {
+        super(page, PortfolioPage.PORTFOLIO_PAGE_URL)
+        // this.portfolioLink = page.getByRole('link', {name: 'Portfolio', exact: true});
+        // this.marketValueLink = page.getByRole('link', {name: /Market Value/});
+        // this.totalReturnsLink = page.getByRole('link', {name: 'Total Returns'});
+        // this.incomeLink = page.getByRole('link', {name: /Income/});
+        // this.feesLink = page.getByRole('link', {name: /Fees/});
+        // this.taxDueLink = page.getByRole('link', {name: /Tax Due/});
+        // // ... other elements on the Portfolio page (Accounts, Assets, etc.)
+        // this.accountsTab = page.getByText('Accounts', {exact: true});
+        // this.assetsTab = page.getByText('Assets', {exact: true});
+        // // ... other tabs (Types, Currencies, etc.)
+        // this.transactionsTab = page.getByText('Transactions', {exact: true});
+    }
+
+
+    async verifyElements() {
+        await expect(this.page.locator('#AppRoot')).toContainText('Market Value');
+        await expect(this.marketValueLink).toBeVisible();
+    }
+
+    async goToSection(sectionName: string) {
+        const sectionLink = this.page.getByRole('link', {name: new RegExp(sectionName)});
+        await sectionLink.click();
+    }
+
+    async clickOnEverything(){
+        await this.page.getByText('Liquid assets').click();
+        await this.page.getByText('Opened').click();
+        await this.page.getByText('Retirement').click();
+        await this.page.getByText('Stocks').click();
+        await this.page.getByText('With Income').click();
+        await this.page.getByText('All assets').click();
+        await this.page.getByRole('link', { name: 'Total Returns +€82,473.38 /1y' }).click();
+        await this.page.getByRole('link', { name: 'Rate of Return (MWR) 7.6% /1y' }).click();
+        await this.page.getByRole('link', { name: 'Income €8,506.55 /1y Yield on' }).click();
+        await this.page.getByRole('link', { name: 'Fees €1,907.21 /1y Fees Rate' }).click();
+        await this.page.getByRole('link', { name: 'Tax Due €1,801.16 /1y Tax' }).click();
+    }
+}
+
+```
+----------------------------------------
+File Name: StartTrialPage.ts, Path: e2e/pages/StartTrialPage.ts
+Content:
+```
+import {BasePage} from "./BasePage";
+import {Locator, Page} from "@playwright/test";
+
+export class StartTrialPage extends BasePage{
+    static readonly START_TRIAL_URL ='https://app.mycapitally.com/login?redirectTo=%2Fstart';
+    static readonly START_TRIAL_TEXT : string = "start your trial 🎉"
+    startTrialHeader : Locator  = this.page.getByRole('heading', { name: StartTrialPage.START_TRIAL_TEXT })
+
+    constructor(page: Page) {
+        super(page, StartTrialPage.START_TRIAL_URL);
+    }
+
+    async getStartTrialHeaderText() {
+        return await this.startTrialHeader.innerText();
+    }
+
+
+}
+```
+----------------------------------------
+File Name: PageObjects.ts, Path: e2e/pages/PageObjects.ts
+Content:
+```
+import {PortfolioPage} from "./PortfolioPage";
+import {SummaryPage} from "./SummaryPage";
+import {StartTrialPage} from "./StartTrialPage";
+
+export interface PageObjects{
+    summaryPage : SummaryPage;
+    startTrialPage: StartTrialPage
+    portfolioPage : PortfolioPage;
+}
+```
+----------------------------------------
+File Name: SummaryPage.ts, Path: e2e/pages/SummaryPage.ts
+Content:
+```
+import {expect, Locator, Page} from '@playwright/test';
+import {BasePage} from "./BasePage";
+import {StartTrialPage} from "./StartTrialPage";
+
+export class SummaryPage extends BasePage {
+    welcomeHeading: Locator = this.page.getByRole('heading', {name: 'Welcome to Capitally Demo 🥳'});
+    startFreeTrialButton: Locator = this.page.getByRole('link', {name: 'Start free trial to see your'})
+    allAssetsLink: Locator = this.page.getByRole('link', {name: 'All assets'});
+    liquidAssetsLink: Locator = this.page.getByRole('link', {name: 'Liquid assets'});
+    totalMarketValueText: Locator = this.page.getByText('Total market value');
+    defaultCompareTo: Locator = this.page.getByText('Compared toS&P');
+    topAssetChanges: Locator = this.page.getByRole('link', {name: 'Top asset changes'})
+    topAccountChanges: Locator = this.page.getByRole('link', {name: 'Top account changes'})
+    topBenchmarkChanges: Locator = this.page.getByText('Top benchmark changes')
+    investmentIncome: Locator = this.page.getByRole('link', {name: 'Investment Income in past year'})
+    upcomingEstimatedIncome: Locator = this.page.getByRole('link', {name: 'Upcoming and estimated Income'})
+    static readonly SUMMARY_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+
+    constructor(page: Page) {
+        super(page, SummaryPage.SUMMARY_PAGE_URL)
+    }
+
+    async verifyElements() {
+        await expect(this.welcomeHeading).toBeVisible();
+        await expect(this.startFreeTrialButton).toBeVisible();
+        await expect(this.allAssetsLink).toContainText('All assets');
+        await expect(this.liquidAssetsLink).toContainText('Liquid assets');
+        await expect(this.totalMarketValueText).toBeVisible();
+        await expect(this.defaultCompareTo).toBeVisible()
+        await expect(this.topAssetChanges).toBeVisible()
+        await expect(this.topAccountChanges).toBeVisible()
+        await expect(this.topBenchmarkChanges).toBeVisible()
+        await expect(this.investmentIncome).toBeVisible()
+        await expect(this.upcomingEstimatedIncome).toBeVisible()
+    }
+
+    async clickStartFreeTrial(){
+        await this.startFreeTrialButton.click()
+        await this.page.waitForSelector(`h1:text("${StartTrialPage.START_TRIAL_TEXT}")`);
+
+
+    }
+}
+
+```
+----------------------------------------
+File Name: BasePage.ts, Path: e2e/pages/BasePage.ts
+Content:
+```
+import {Locator, Page} from '@playwright/test'
+
+export class BasePage {
+    protected page: Page;
+    protected url: string;
+    acceptAllButton: Locator;
+
+    constructor(page: Page, url: string) {
+        this.page = page;
+        this.url = url
+        this.acceptAllButton = this.page.getByRole('button', { name: 'Accept all' });
+    }
+
+    async navigate() {
+        await this.page.goto(this.url);
+    }
+
+    async acceptCookies(){
+        await this.acceptAllButton.click()
+    }
+}
+```
+----------------------------------------
