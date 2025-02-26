@@ -20,23 +20,22 @@ test("Verify Portfolio - adding assets not supported by demo account", async ({t
 )
 
 test("Verify Portfolio - adding new transaction", async ({testContext}) => {
-    let positionName = 'Microsoft Corporation';
-    const {assetPage, portfolioPage} = testContext
+        let positionName = 'Microsoft Corporation';
+        const {assetPage, portfolioPage} = testContext
 
-    const timestamp = Date.now();
-    const transactionName: string = `My Transaction @ ${timestamp}`;
-    const transactionAmount: number = 1
+        const timestamp = Date.now();
+        const transactionName: string = `My Transaction @ ${timestamp}`;
+        const transactionAmount: number = 1
 
-    await portfolioPage.navigate()
-    await portfolioPage.acceptCookies()
+        await portfolioPage.navigate()
+        await portfolioPage.acceptCookies()
 
-    await portfolioPage.openPositionDetails(positionName)
-    await assetPage.performBuyTransaction(transactionAmount, transactionName)
-    await assetPage.clickTransactionsTab()
-    await assetPage.openBuyTransaction()
+        await portfolioPage.openPositionDetails(positionName)
+        await assetPage.performBuyTransaction(transactionAmount, transactionName)
+        await assetPage.clickTransactionsTab()
+        await assetPage.openBuyTransaction()
 
-    await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
-    await expect(assetPage.getTransactionNotes()).toContainText(transactionName)
-
-
-})
+        await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
+        await expect(assetPage.getTransactionNotes()).toContainText(transactionName)
+    }
+)

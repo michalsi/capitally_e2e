@@ -3,6 +3,9 @@ import {BasePage} from "./BasePage";
 import {StartTrialPage} from "./StartTrialPage";
 
 export class SummaryPage extends BasePage {
+    protected getPageLoadSelectors(): Locator[] {
+        throw new Error('Method not implemented.');
+    }
     welcomeHeading: Locator = this.page.getByRole('heading', {name: 'Welcome to Capitally Demo 🥳'});
     startFreeTrialButton: Locator = this.page.getByRole('link', {name: 'Start free trial to see your'})
     allAssetsLink: Locator = this.page.getByRole('link', {name: 'All assets'});
@@ -14,6 +17,8 @@ export class SummaryPage extends BasePage {
     topBenchmarkChanges: Locator = this.page.getByText('Top benchmark changes')
     investmentIncome: Locator = this.page.getByRole('link', {name: 'Investment Income in past year'})
     upcomingEstimatedIncome: Locator = this.page.getByRole('link', {name: 'Upcoming and estimated Income'})
+   reportsMenu: Locator = this.page.getByRole('link', { name: 'Reports', exact: true });
+
     readonly url = '/demo-1/summary';
 
     constructor(page: Page) {
@@ -37,7 +42,9 @@ export class SummaryPage extends BasePage {
     async clickStartFreeTrial(){
         await this.startFreeTrialButton.click()
         await this.page.waitForSelector(`h1:text("${StartTrialPage.START_TRIAL_TEXT}")`);
+    }
 
-
+    async clickReportsMenu(){
+        await this.reportsMenu.click();
     }
 }

@@ -2,7 +2,9 @@ import {Locator, Page} from "@playwright/test";
 import {BasePage} from "./BasePage";
 
 export class TransactionModal extends BasePage {
-    // Locators
+    protected getPageLoadSelectors(): Locator[] {
+        throw new Error("Method not implemented.");
+    }
     buyRadioButton: Locator = this.page.getByRole('radio', {name: 'Buy'});
     quantityInput: Locator = this.page.locator('input[name="qty"]');
     dollarSymbolLink: Locator = this.page.locator('a').filter({hasText: '$'});

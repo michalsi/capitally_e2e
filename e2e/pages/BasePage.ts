@@ -18,5 +18,16 @@ readonly BASE_URL = 'https://app.mycapitally.com/project';
     async acceptCookies(){
         await this.acceptAllButton.click()
     }
+
+    protected abstract getPageLoadSelectors(): Locator[];
+
+    async waitForPageLoad() {
+        await Promise.all([
+            this.page.waitForLoadState('networkidle'),
+            ...this.getPageLoadSelectors().map(selector =>
+                selector.waitFor({ state: 'visible' })
+            )
+        ]);
+    }
 }
 

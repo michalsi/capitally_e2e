@@ -7,17 +7,22 @@ import {SummaryPage} from './pages/SummaryPage';
 import {PageObjects} from './pages/pageObjects'
 import {StartTrialPage} from "./pages/StartTrialPage";
 import {PortfolioPage} from "./pages/PortfolioPage";
+import {AssetPage} from "./pages/AssetPage";
+import {ReportsPage} from "./pages/ReportsPage";
+import {TransactionModal} from "./pages/TransactionModal";
 
 export const test = base.extend<{
     testContext: PageObjects
 }>({
     testContext: async ({page}, use) => {
         const testContext: PageObjects = {
+            assetPage: new AssetPage(page),
+            portfolioPage: new PortfolioPage(page),
+            reportsPage: new ReportsPage(page),
             summaryPage: new SummaryPage(page),
             startTrialPage: new StartTrialPage(page),
-            portfolioPage: new PortfolioPage(page)
+            transactionModal: new TransactionModal(page)
         }
-        acceptCookies()
         await use(testContext)
     },
 
@@ -53,76 +58,260 @@ File Name: PortfolioTest.spec.ts, Path: e2e/tests/PortfolioTest.spec.ts
 Content:
 ```
 import {test} from "../fixtures";
+import {expect} from "@playwright/test";
 
-test("Portfolio test", async ({testContext}) => {
+test("Verify Portfolio - adding assets not supported by demo account", async ({testContext}) => {
+        let searchAsset = "tesla";
+        let assetNameToWait = "Tesla Inc Stock · NASDAQ TSLA";
+
         const {portfolioPage} = testContext
         await portfolioPage.navigate()
-        await portfolioPage.clickOnEverything()
+        await portfolioPage.acceptCookies()
+
+        await portfolioPage.clickThroughAllUpperMenuItems()
+        await portfolioPage.clickThroughAllLowerMenuItems()
+
+        await portfolioPage.clickPositions()
+        await portfolioPage.addAsset(searchAsset, assetNameToWait)
+        await expect(portfolioPage.getAddAssetDemoDialog()).toBeVisible()
+        await portfolioPage.closeAddAssetDemoDialog()
     }
 )
+
+test("Verify Portfolio - adding new transaction", async ({testContext}) => {
+        let positionName = 'Microsoft Corporation';
+        const {assetPage, portfolioPage} = testContext
+
+        const timestamp = Date.now();
+        const transactionName: string = `My Transaction @ ${timestamp}`;
+        const transactionAmount: number = 1
+
+        await portfolioPage.navigate()
+        await portfolioPage.acceptCookies()
+
+        await portfolioPage.openPositionDetails(positionName)
+        await assetPage.performBuyTransaction(transactionAmount, transactionName)
+        await assetPage.clickTransactionsTab()
+        await assetPage.openBuyTransaction()
+
+        await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
+        await expect(assetPage.getTransactionNotes()).toContainText(transactionName)
+    }
+)
+```
+----------------------------------------
+File Name: ReportsTest.spec.ts, Path: e2e/tests/ReportsTest.spec.ts
+Content:
+```
+import {test} from "../fixtures";
+import {expect} from "@playwright/test";
+
+test("Reports Test", async ({testContext})=>{
+    const {summaryPage, reportsPage} = testContext
+    await summaryPage.navigate()
+    await summaryPage.acceptCookies()
+
+    await summaryPage.clickReportsMenu()
+    await expect(reportsPage.getHeader()).toBeVisible()
+    await expect(reportsPage.getTotalsHeader()).toBeVisible()
+
+    let values = await reportsPage.getTotalRowValues()
+    console.log(values)
+})
 ```
 ----------------------------------------
 File Name: PortfolioPage.ts, Path: e2e/pages/PortfolioPage.ts
 Content:
 ```
-import {expect, Page} from '@playwright/test';
-import {BasePage} from "./BasePage";
+import {expect, Locator, Page} from '@playwright/test';
+import {BasePage} from './BasePage';
 
 export class PortfolioPage extends BasePage {
-    portfolioLink: any;
-    marketValueLink: any;
-    totalReturnsLink: any;
-    incomeLink: any;
-    feesLink: any;
-    taxDueLink: any;
-    accountsTab: any;
-    assetsTab: any;
-    transactionsTab: any;
+    totalReturnsLink: Locator = this.page.getByRole('link', {name: 'Total Returns'});
+    incomeLink: Locator = this.page.getByRole('link', {name: /Income/});
+    feesLink: Locator = this.page.getByRole('link', {name: /Fees/});
+    taxDueLink: Locator = this.page.getByRole('link', {name: /Tax Due/});
+    accountsTab: Locator = this.page.getByText('Accounts', {exact: true});
+    assetsTab: Locator = this.page.getByText('Assets', {exact: true});
+    transactionsTab: Locator = this.page.getByText('Transactions', {exact: true});
 
-    static readonly PORTFOLIO_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+    typesLink: Locator = this.page.getByText('Types');
+    currenciesLink: Locator = this.page.getByText('Currencies');
+    marketsLink: Locator = this.page.getByText('Markets');
+    tagsLink: Locator = this.page.getByText('Tags');
+    categoriesLink: Locator = this.page.getByText('Categories');
+    regionsLink: Locator = this.page.getByText('Regions');
+    sectorsLink: Locator = this.page.getByText('Sectors');
+    positionsLink: Locator = this.page.getByText('Positions');
 
+    allAssetsLink: Locator = this.page.getByText('All assets');
+    liquidAssetsLink: Locator = this.page.getByText('Liquid assets');
+    openedLink: Locator = this.page.getByText('Opened');
+    retirementLink: Locator = this.page.getByText('Retirement');
+    stocksLink: Locator = this.page.getByText('Stocks');
+    withIncomeLink: Locator = this.page.getByText('With Income');
+    rateOfReturnLink: Locator = this.page.getByRole('link', {name: 'Rate of Return (MWR)'});
+
+    addAssetButton: Locator = this.page.getByRole('button', {name: 'Add Asset'});
+    assetCombobox: Locator = this.page.getByRole('combobox', {name: "Enter asset's name, SYMBOL or"});
+    addAssetDialog: Locator = this.page.getByText('This is a Demo projectDemo');
+    okButton: Locator = this.page.getByRole('button', {name: 'OK'});
+
+    searchBox: Locator = this.page.getByRole('textbox', {name: 'Type here to search the table'});
+
+
+
+    readonly url = '/demo-1/explorer';
 
     constructor(page: Page) {
-        super(page, PortfolioPage.PORTFOLIO_PAGE_URL)
-        // this.portfolioLink = page.getByRole('link', {name: 'Portfolio', exact: true});
-        // this.marketValueLink = page.getByRole('link', {name: /Market Value/});
-        // this.totalReturnsLink = page.getByRole('link', {name: 'Total Returns'});
-        // this.incomeLink = page.getByRole('link', {name: /Income/});
-        // this.feesLink = page.getByRole('link', {name: /Fees/});
-        // this.taxDueLink = page.getByRole('link', {name: /Tax Due/});
-        // // ... other elements on the Portfolio page (Accounts, Assets, etc.)
-        // this.accountsTab = page.getByText('Accounts', {exact: true});
-        // this.assetsTab = page.getByText('Assets', {exact: true});
-        // // ... other tabs (Types, Currencies, etc.)
-        // this.transactionsTab = page.getByText('Transactions', {exact: true});
+        super(page);
     }
 
-
-    async verifyElements() {
-        await expect(this.page.locator('#AppRoot')).toContainText('Market Value');
-        await expect(this.marketValueLink).toBeVisible();
+    async clickLiquidAssets() {
+        await this.liquidAssetsLink.click();
     }
 
-    async goToSection(sectionName: string) {
-        const sectionLink = this.page.getByRole('link', {name: new RegExp(sectionName)});
-        await sectionLink.click();
+    async clickOpened() {
+        await this.openedLink.click();
     }
 
-    async clickOnEverything(){
-        await this.page.getByText('Liquid assets').click();
-        await this.page.getByText('Opened').click();
-        await this.page.getByText('Retirement').click();
-        await this.page.getByText('Stocks').click();
-        await this.page.getByText('With Income').click();
-        await this.page.getByText('All assets').click();
-        await this.page.getByRole('link', { name: 'Total Returns +€82,473.38 /1y' }).click();
-        await this.page.getByRole('link', { name: 'Rate of Return (MWR) 7.6% /1y' }).click();
-        await this.page.getByRole('link', { name: 'Income €8,506.55 /1y Yield on' }).click();
-        await this.page.getByRole('link', { name: 'Fees €1,907.21 /1y Fees Rate' }).click();
-        await this.page.getByRole('link', { name: 'Tax Due €1,801.16 /1y Tax' }).click();
+    async clickRetirement() {
+        await this.retirementLink.click();
     }
+
+    async clickStocks() {
+        await this.stocksLink.click();
+    }
+
+    async clickWithIncome() {
+        await this.withIncomeLink.click();
+    }
+
+    async clickAllAssets() {
+        await this.allAssetsLink.click();
+    }
+
+    async clickTotalReturns() {
+        await this.totalReturnsLink.click();
+    }
+
+    async clickRateOfReturn() {
+        await this.rateOfReturnLink.click();
+    }
+
+    async clickIncome() {
+        await this.incomeLink.click();
+    }
+
+    async clickFees() {
+        await this.feesLink.click();
+    }
+
+    async clickTaxDue() {
+        await this.taxDueLink.click();
+    }
+
+    async clickThroughAllUpperMenuItems() {
+        await this.clickLiquidAssets();
+        await this.clickOpened();
+        await this.clickRetirement();
+        await this.clickStocks();
+        await this.clickWithIncome();
+        await this.clickAllAssets();
+        await this.clickTotalReturns();
+        await this.clickRateOfReturn();
+        await this.clickIncome();
+        await this.clickFees();
+        await this.clickTaxDue();
+    }
+
+    async clickAccounts() {
+        await this.accountsTab.click();
+    }
+
+    async clickPositions() {
+        await this.positionsLink.click()
+    }
+
+    async clickAssets() {
+        await this.assetsTab.click();
+    }
+
+    async clickTransactions() {
+        await this.transactionsTab.click();
+    }
+
+    async clickTypes() {
+        await this.typesLink.click();
+    }
+
+    async clickTags() {
+        await this.tagsLink.click();
+    }
+
+    async clickCurrencies() {
+        await this.currenciesLink.click();
+    }
+
+    async clickMarkets() {
+        await this.marketsLink.click();
+    }
+
+    async clickCategories() {
+        await this.categoriesLink.click();
+    }
+
+    async clickRegions() {
+        await this.regionsLink.click();
+    }
+
+    async clickSectors() {
+        await this.sectorsLink.click();
+    }
+
+    // Method to click through all lower menu items
+    async clickThroughAllLowerMenuItems() {
+        await this.clickAccounts();
+        await this.clickAssets();
+        await this.clickTypes();
+        await this.clickCurrencies();
+        await this.clickMarkets();
+        await this.clickTags();
+        await this.clickCategories();
+        await this.clickRegions();
+        await this.clickSectors();
+        await this.clickTransactions();
+        await this.clickPositions();
+    }
+
+    async openMenuAndSelectPosition() {
+        await this.addAssetButton.click();
+    }
+
+    async addAsset(assetName: string, assetNameToWait: string) {
+        await this.addAssetButton.click();
+        await this.assetCombobox.click();
+        await this.assetCombobox.fill(assetName);
+        await expect(this.page.getByRole('option', {name: assetNameToWait})).toBeVisible();
+        await this.assetCombobox.press('Enter');
+    }
+
+    getAddAssetDemoDialog() {
+        return this.addAssetDialog
+    }
+
+    async closeAddAssetDemoDialog() {
+        await this.okButton.click();
+
+    }
+
+    async openPositionDetails(positionName: string) {
+        await this.searchBox.fill(positionName);
+        await this.searchBox.press('Enter');
+        await this.page.getByRole('link', {name: positionName}).click()
+    }
+
 }
-
 ```
 ----------------------------------------
 File Name: StartTrialPage.ts, Path: e2e/pages/StartTrialPage.ts
@@ -132,12 +321,12 @@ import {BasePage} from "./BasePage";
 import {Locator, Page} from "@playwright/test";
 
 export class StartTrialPage extends BasePage{
-    static readonly START_TRIAL_URL ='https://app.mycapitally.com/login?redirectTo=%2Fstart';
+    readonly url = null;
     static readonly START_TRIAL_TEXT : string = "start your trial 🎉"
     startTrialHeader : Locator  = this.page.getByRole('heading', { name: StartTrialPage.START_TRIAL_TEXT })
 
     constructor(page: Page) {
-        super(page, StartTrialPage.START_TRIAL_URL);
+        super(page);
     }
 
     async getStartTrialHeaderText() {
@@ -148,17 +337,143 @@ export class StartTrialPage extends BasePage{
 }
 ```
 ----------------------------------------
+File Name: ReportsPage.ts, Path: e2e/pages/ReportsPage.ts
+Content:
+```
+import {BasePage} from "./BasePage";
+import {Locator, Page} from "@playwright/test";
+
+export class ReportsPage extends BasePage{
+    header: Locator = this.page.locator('h1');
+    totalRow: Locator =this.page.locator('._footer_bevwa_20 .notranslate span');
+    totalsHeader: Locator = this.page.getByText('Totals')
+    readonly url: string = this.BASE_URL + "/demo-1/reports/r-income";
+
+    constructor(page : Page) {
+        super(page);
+    }
+
+    async getTotalRowValues(){
+        const values = await this.totalRow.allTextContents();
+        return values.join(' ');
+    }
+
+    getHeader(){
+        return this.header;
+    }
+
+    getTotalsHeader(){
+        return this.totalsHeader;
+    }
+}
+```
+----------------------------------------
+File Name: TransactionModal.ts, Path: e2e/pages/TransactionModal.ts
+Content:
+```
+import {Locator, Page} from "@playwright/test";
+import {BasePage} from "./BasePage";
+
+export class TransactionModal extends BasePage {
+    // Locators
+    buyRadioButton: Locator = this.page.getByRole('radio', {name: 'Buy'});
+    quantityInput: Locator = this.page.locator('input[name="qty"]');
+    dollarSymbolLink: Locator = this.page.locator('a').filter({hasText: '$'});
+    paragraphElement: Locator = this.page.getByRole('paragraph');
+    emptyNotesTextbox: Locator = this.page.locator('div')
+        .filter({hasText: /^NotesAdd a note, you can use \*\*markdown\*\* and paste links here\.\.\.$/})
+        .getByRole('textbox');
+    notesTextBox: Locator = this.page.locator('div').filter({hasText: /^Notes$/}).locator('+ div');
+    addButton: Locator = this.page.getByRole('button', {name: 'Add'});
+
+    readonly url = null;
+
+    constructor(page: Page) {
+        super(page);
+    }
+
+    async addTransactionDetails(amount: number, notes: string) {
+        await this.buyRadioButton.check();
+        await this.quantityInput.fill(String(amount));
+        await this.dollarSymbolLink.click();
+        await this.paragraphElement.click();
+        await this.emptyNotesTextbox.fill(notes);
+        await this.addButton.click();
+    }
+
+    getTransactionQuantity() {
+        return this.quantityInput
+    }
+
+    getTransactionNotes() {
+        return this.notesTextBox;
+    }
+}
+```
+----------------------------------------
+File Name: AssetPage.ts, Path: e2e/pages/AssetPage.ts
+Content:
+```
+import {BasePage} from "./BasePage";
+import {Locator, Page} from "@playwright/test";
+import {TransactionModal} from "./TransactionModal";
+
+export class AssetPage extends BasePage {
+    readonly url: string = null;
+    transactionModal: TransactionModal
+    addTransactionButton: Locator = this.page.getByRole('button', {name: 'Add Transaction'})
+    transactionsTab: Locator = this.page.locator('div').filter({hasText: /^Transactions$/})
+    buyTransactionLink: Locator = this.page.getByText('Buy', {exact: true})
+
+    constructor(page: Page) {
+        super(page);
+        this.transactionModal = new TransactionModal(page);
+
+    }
+
+    async performBuyTransaction(amount: number, transactionNotes: string) {
+        await this.addTransactionButton.click()
+
+        await this.transactionModal.addTransactionDetails(amount, transactionNotes)
+    }
+
+    async clickTransactionsTab() {
+        await this.transactionsTab.click();
+    }
+
+    async openBuyTransaction() {
+        await this.buyTransactionLink.click()
+        await this.page.getByText('BuyMSFT · Microsoft CorporationDateAccount🏦Stocks').waitFor()
+    }
+
+    getTransactionQuantity() {
+        return this.transactionModal.getTransactionQuantity()
+    }
+
+    getTransactionNotes() {
+        return this.transactionModal.getTransactionNotes()
+    }
+}
+```
+----------------------------------------
 File Name: PageObjects.ts, Path: e2e/pages/PageObjects.ts
 Content:
 ```
+import {AssetPage} from "./AssetPage"
 import {PortfolioPage} from "./PortfolioPage";
+import {ReportsPage} from "./ReportsPage";
 import {SummaryPage} from "./SummaryPage";
 import {StartTrialPage} from "./StartTrialPage";
+import {TransactionModal} from "./TransactionModal";
+
 
 export interface PageObjects{
+    assetPage : AssetPage;
     summaryPage : SummaryPage;
     startTrialPage: StartTrialPage
     portfolioPage : PortfolioPage;
+    reportsPage: ReportsPage;
+    transactionModal : TransactionModal;
 }
 ```
 ----------------------------------------
@@ -181,10 +496,12 @@ export class SummaryPage extends BasePage {
     topBenchmarkChanges: Locator = this.page.getByText('Top benchmark changes')
     investmentIncome: Locator = this.page.getByRole('link', {name: 'Investment Income in past year'})
     upcomingEstimatedIncome: Locator = this.page.getByRole('link', {name: 'Upcoming and estimated Income'})
-    static readonly SUMMARY_PAGE_URL: string = 'https://app.mycapitally.com/project/demo-1/summary';
+   reportsMenu: Locator = this.page.getByRole('link', { name: 'Reports', exact: true });
+
+    readonly url = '/demo-1/summary';
 
     constructor(page: Page) {
-        super(page, SummaryPage.SUMMARY_PAGE_URL)
+        super(page)
     }
 
     async verifyElements() {
@@ -204,8 +521,10 @@ export class SummaryPage extends BasePage {
     async clickStartFreeTrial(){
         await this.startFreeTrialButton.click()
         await this.page.waitForSelector(`h1:text("${StartTrialPage.START_TRIAL_TEXT}")`);
+    }
 
-
+    async clickReportsMenu(){
+        await this.reportsMenu.click();
     }
 }
 
@@ -216,24 +535,26 @@ Content:
 ```
 import {Locator, Page} from '@playwright/test'
 
-export class BasePage {
+export abstract class BasePage {
     protected page: Page;
-    protected url: string;
+readonly BASE_URL = 'https://app.mycapitally.com/project';
+    readonly abstract url: string;
     acceptAllButton: Locator;
 
-    constructor(page: Page, url: string) {
+    protected constructor(page: Page) {
         this.page = page;
-        this.url = url
         this.acceptAllButton = this.page.getByRole('button', { name: 'Accept all' });
     }
 
     async navigate() {
-        await this.page.goto(this.url);
+        await this.page.goto(this.BASE_URL + this.url);
     }
 
     async acceptCookies(){
         await this.acceptAllButton.click()
     }
 }
+
+
 ```
 ----------------------------------------

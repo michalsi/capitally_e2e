@@ -2,6 +2,9 @@ import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from './BasePage';
 
 export class PortfolioPage extends BasePage {
+    protected getPageLoadSelectors(): Locator[] {
+        throw new Error('Method not implemented.');
+    }
     totalReturnsLink: Locator = this.page.getByRole('link', {name: 'Total Returns'});
     incomeLink: Locator = this.page.getByRole('link', {name: /Income/});
     feesLink: Locator = this.page.getByRole('link', {name: /Fees/});
@@ -144,7 +147,6 @@ export class PortfolioPage extends BasePage {
         await this.sectorsLink.click();
     }
 
-    // Method to click through all lower menu items
     async clickThroughAllLowerMenuItems() {
         await this.clickAccounts();
         await this.clickAssets();
@@ -157,10 +159,6 @@ export class PortfolioPage extends BasePage {
         await this.clickSectors();
         await this.clickTransactions();
         await this.clickPositions();
-    }
-
-    async openMenuAndSelectPosition() {
-        await this.addAssetButton.click();
     }
 
     async addAsset(assetName: string, assetNameToWait: string) {
@@ -177,7 +175,6 @@ export class PortfolioPage extends BasePage {
 
     async closeAddAssetDemoDialog() {
         await this.okButton.click();
-
     }
 
     async openPositionDetails(positionName: string) {
