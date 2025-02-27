@@ -14,13 +14,27 @@ export const test = base.extend<{
 }>({
     testContext: async ({page}, use) => {
         const testContext: PageObjects = {
-            assetPage: new AssetPage(page),
-            importPage: new ImportPage(page),
-            portfolioPage: new PortfolioPage(page),
-            reportsPage: new ReportsPage(page),
-            startTrialPage: new StartTrialPage(page),
-            summaryPage: new SummaryPage(page),
-            transactionModal: new TransactionModal(page)
+            get assetPage() {
+                return new AssetPage(page);
+            },
+            get importPage() {
+                return new ImportPage(page);
+            },
+            get portfolioPage() {
+                return new PortfolioPage(page);
+            },
+            get reportsPage() {
+                return new ReportsPage(page);
+            },
+            get startTrialPage() {
+                return new StartTrialPage(page);
+            },
+            get summaryPage() {
+                return new SummaryPage(page);
+            },
+            get transactionModal() {
+                return new TransactionModal(page);
+            },
         }
         await use(testContext)
     },

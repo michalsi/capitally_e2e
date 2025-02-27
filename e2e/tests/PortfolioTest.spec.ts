@@ -5,7 +5,7 @@ test("Verify Portfolio - adding assets not supported by demo account", async ({t
         let searchAsset = "tesla";
         let assetNameToWait = "Tesla Inc Stock · NASDAQ TSLA";
 
-        const {portfolioPage} = testContext
+        const portfolioPage = testContext.portfolioPage;
         await portfolioPage.navigate()
         await portfolioPage.acceptCookies()
 

@@ -6,7 +6,8 @@ import {CSVRow} from "../models/CSVTypes";
 
 
 test("Reports Test - verify exporting to CSV file", async ({testContext}) => {
-    const {summaryPage, reportsPage} = testContext;
+    const summaryPage  = testContext.summaryPage ;
+    const reportsPage = testContext.reportsPage;
 
     await summaryPage.navigate();
     await summaryPage.acceptCookies();

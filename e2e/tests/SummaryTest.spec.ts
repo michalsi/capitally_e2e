@@ -4,7 +4,9 @@ import {StartTrialPage} from "../pages/StartTrialPage";
 
 
 test('Verify Summary page and redirection to the free trial page', async ({testContext}) => {
-        const {summaryPage, startTrialPage} = testContext
+        const summaryPage = testContext.summaryPage;
+        const startTrialPage = testContext.startTrialPage;
+
         const {START_TRIAL_TEXT} = StartTrialPage;
 
         await summaryPage.navigate();

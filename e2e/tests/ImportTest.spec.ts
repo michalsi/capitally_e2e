@@ -4,7 +4,8 @@ import * as path from 'path';
 
 test("Import test", async({testContext})=>{
     const filePath = path.join(__dirname, '../data/mbankTransactions.csv');
-    const {summaryPage, importPage} = testContext
+    const summaryPage = testContext.summaryPage;
+    const importPage = testContext.importPage;
 
     await summaryPage.navigate();
     await summaryPage.acceptCookies();
