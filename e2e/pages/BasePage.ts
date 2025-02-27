@@ -12,7 +12,13 @@ readonly BASE_URL = 'https://app.mycapitally.com/project';
     }
 
     async navigate() {
-        await this.page.goto(this.BASE_URL + this.url);
+        try {
+            await this.page.goto(this.BASE_URL + this.url);
+        } catch (error) {
+            console.error(`Failed to navigate to ${this.url}:`, error);
+            throw new Error(`Navigation error: ${error.message}`);
+        }
+
     }
 
     async acceptCookies(){

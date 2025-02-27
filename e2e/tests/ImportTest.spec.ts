@@ -1,5 +1,4 @@
 import {test} from "../fixtures";
-import {expect} from "@playwright/test";
 import * as path from 'path';
 import {expectElementToBeVisible, expectTextToContain} from '../utils/AssertionHelper';
 
