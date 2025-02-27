@@ -9,7 +9,8 @@ export class ImportPage extends BasePage {
     cancelImportButton: Locator = this.page.getByRole('button', { name: 'Cancel import' })
     nextImportStepButton: Locator =  this.page.getByRole('button', { name: 'Next' });
     appRootLocator : Locator =  this.page.locator('#AppRoot');
-    reviewHeader : Locator = this.page.locator('h2').first()
+    reviewHeader: Locator = this.page.locator('h2:has-text("Review items to be imported")');
+
 
     constructor(page: Page) {
         super(page);

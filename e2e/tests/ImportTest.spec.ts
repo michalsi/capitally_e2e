@@ -1,6 +1,7 @@
 import {test} from "../fixtures";
 import {expect} from "@playwright/test";
 import * as path from 'path';
+import {expectElementToBeVisible, expectTextToContain} from '../utils/AssertionHelper';
 
 test("Import test", async({testContext})=>{
     const filePath = path.join(__dirname, '../data/mbankTransactions.csv');
@@ -17,8 +18,8 @@ test("Import test", async({testContext})=>{
     await importPage.clickMBankImportTransactionsTab();
     await importPage.uploadFile(filePath);
 
-    await expect(importPage.getReviewHeader()).toContainText('Review items to be imported');
+    await expectTextToContain(importPage.getReviewHeader(), 'Review items to be imported', 'Review Header');
     await importPage.clickNextImportStep();
-    await expect(importPage.getDemoImportWarningText()).toBeVisible()
+    await expectElementToBeVisible(importPage.getDemoImportWarningText(), 'Demo Import Warning Text');
     await importPage.clickCancelImport();
 })

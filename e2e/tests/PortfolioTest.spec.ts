@@ -1,5 +1,6 @@
 import {test} from "../fixtures";
 import {expect} from "@playwright/test";
+import {expectElementToBeVisible, expectTextToContain} from "../utils/AssertionHelper";
 
 test("Verify Portfolio - adding assets not supported by demo account", async ({testContext}) => {
         let searchAsset = "tesla";
@@ -14,7 +15,7 @@ test("Verify Portfolio - adding assets not supported by demo account", async ({t
 
         await portfolioPage.clickPositions()
         await portfolioPage.addAsset(searchAsset, assetNameToWait)
-        await expect(portfolioPage.getAddAssetDemoDialog()).toBeVisible()
+        await expectElementToBeVisible(portfolioPage.getAddAssetDemoDialog(), 'Add Asset Demo Dialog');
         await portfolioPage.closeAddAssetDemoDialog()
     }
 )
@@ -36,6 +37,6 @@ test("Verify Portfolio - adding new transaction", async ({testContext}) => {
         await assetPage.openBuyTransaction()
 
         await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
-        await expect(assetPage.getTransactionNotes()).toContainText(transactionName)
+        await expectTextToContain(assetPage.getTransactionNotes(), transactionName, 'Transaction Notes');
     }
 )

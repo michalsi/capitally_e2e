@@ -13,6 +13,10 @@ export class StartTrialPage extends BasePage{
         super(page);
     }
 
+    // get startTrialHeader() {
+    //     return this.startTrialHeader
+    // }
+    //
     async getStartTrialHeaderText() {
         return await this.startTrialHeader.innerText();
     }
