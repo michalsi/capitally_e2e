@@ -18,6 +18,7 @@ export class SummaryPage extends BasePage {
     investmentIncome: Locator = this.page.getByRole('link', {name: 'Investment Income in past year'})
     upcomingEstimatedIncome: Locator = this.page.getByRole('link', {name: 'Upcoming and estimated Income'})
    reportsMenu: Locator = this.page.getByRole('link', { name: 'Reports', exact: true });
+    importMenu: Locator = this.page.getByRole('link', { name: 'Import', exact: true });
 
     readonly url = '/demo-1/summary';
 
@@ -46,5 +47,9 @@ export class SummaryPage extends BasePage {
 
     async clickReportsMenu(){
         await this.reportsMenu.click();
+    }
+
+    async clickImportMenu() {
+        await this.importMenu.click();
     }
 }

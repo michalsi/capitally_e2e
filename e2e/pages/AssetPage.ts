@@ -3,6 +3,10 @@ import {Locator, Page} from "@playwright/test";
 import {TransactionModal} from "./TransactionModal";
 
 export class AssetPage extends BasePage {
+    protected getPageLoadSelectors(): Locator[] {
+        throw new Error("Method not implemented.");
+    }
+
     readonly url: string = null;
     transactionModal: TransactionModal
     addTransactionButton: Locator = this.page.getByRole('button', {name: 'Add Transaction'})
