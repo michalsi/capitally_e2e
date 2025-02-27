@@ -1,14 +1,16 @@
 import {Locator, Page} from '@playwright/test'
+import {IPage} from '../interfaces';
 
-export abstract class BasePage {
-    protected page: Page;
-readonly BASE_URL = 'https://app.mycapitally.com/project';
+
+export abstract class BasePage implements IPage {
+    protected readonly page: Page;
+    protected readonly BASE_URL = 'https://app.mycapitally.com/project';
     readonly abstract url: string;
-    acceptAllButton: Locator;
+    protected acceptAllButton: Locator;
 
     protected constructor(page: Page) {
         this.page = page;
-        this.acceptAllButton = this.page.getByRole('button', { name: 'Accept all' });
+        this.acceptAllButton = this.page.getByRole('button', {name: 'Accept all'});
     }
 
     async navigate() {
@@ -21,17 +23,21 @@ readonly BASE_URL = 'https://app.mycapitally.com/project';
 
     }
 
-    async acceptCookies(){
-        await this.acceptAllButton.click()
+    async acceptCookies() {
+        try {
+            await this.acceptAllButton.click();
+        } catch (error) {
+            console.warn('Cookie banner not found or already accepted');
+        }
     }
 
-    protected abstract getPageLoadSelectors(): Locator[];
+    abstract getPageLoadSelectors(): Locator[];
 
     async waitForPageLoad() {
         await Promise.all([
             this.page.waitForLoadState('networkidle'),
             ...this.getPageLoadSelectors().map(selector =>
-                selector.waitFor({ state: 'visible' })
+                selector.waitFor({state: 'visible'})
             )
         ]);
     }
