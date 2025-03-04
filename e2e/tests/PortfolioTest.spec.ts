@@ -31,8 +31,6 @@ test.describe('Portfolio Test', () => {
                 const transactionAmount: number = 1
 
                 await portfolioPage.navigate()
-                await portfolioPage.acceptCookies()
-
                 await portfolioPage.openPositionDetails(positionName)
                 await assetPage.performBuyTransaction(transactionAmount, transactionName)
                 await assetPage.clickTransactionsTab()
