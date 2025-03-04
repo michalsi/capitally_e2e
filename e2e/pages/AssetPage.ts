@@ -41,4 +41,8 @@ export class AssetPage extends BasePage {
     getTransactionNotes() {
         return this.transactionModal.getTransactionNotes()
     }
+
+    getNoteText(expectedText: string) {
+        return this.transactionModal.getNoteText(expectedText)
+    }
 }

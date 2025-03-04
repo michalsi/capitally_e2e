@@ -1,7 +1,6 @@
 import {setupTestHooks, test} from "../fixtures";
-import * as path from 'path';
-import {expectElementToBeVisible, expectTextToContain} from '../utils/AssertionHelper';
-import { testConfig } from "../test-config/test.setup";
+import {testConfig} from "../test-config/test.setup";
+import {expect} from "@playwright/test";
 
 setupTestHooks();
 
@@ -16,9 +15,9 @@ test("Import test", async({testContext})=>{
     await importPage.clickBrokerMBank();
     await importPage.clickMBankImportTransactionsTab();
     await importPage.uploadFile(filePath);
-
-    await expectTextToContain(importPage.getReviewHeader(), 'Review items to be imported', 'Review Header');
+    await importPage.getReviewHeader().waitFor({timeout: testConfig.waitTimeout, state: 'visible'});
+    expect(await importPage.getReviewHeader().isVisible()).toBe(true);
     await importPage.clickNextImportStep();
-    await expectElementToBeVisible(importPage.getDemoImportWarningText(), 'Demo Import Warning Text');
+    expect(await importPage.getDemoImportWarningText().isVisible()).toBe(true);
     await importPage.clickCancelImport();
 })

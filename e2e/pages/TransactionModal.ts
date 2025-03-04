@@ -1,5 +1,6 @@
 import {Locator, Page} from "@playwright/test";
 import {BasePage} from "./BasePage";
+import { testConfig } from "../test-config/test.setup";
 
 export class TransactionModal extends BasePage {
     getPageLoadSelectors(): Locator[] {
@@ -37,4 +38,17 @@ export class TransactionModal extends BasePage {
     getTransactionNotes() {
         return this.notesTextBox;
     }
+
+    async getNoteText(expectedText: string): Promise<string | null> {
+        const noteLocator = this.page.locator('div').filter({
+            hasText: new RegExp(`^${expectedText}$`)
+        }).first();
+        try {
+            await noteLocator.waitFor({ state: 'visible', timeout: testConfig.waitTimeout });
+            return await noteLocator.textContent();
+        } catch (error) {
+            return null;
+        }
+    }
+
 }

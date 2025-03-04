@@ -1,7 +1,7 @@
 import {setupTestHooks, test} from '../fixtures'
 import {StartTrialPage} from "../pages/StartTrialPage";
-import {expectElementToBeVisible, expectTextToContain} from "../utils/AssertionHelper";
 import {SummaryPage} from "../pages/SummaryPage";
+import {expect} from "@playwright/test";
 
 setupTestHooks();
 
@@ -14,19 +14,19 @@ test('Verify Summary page and redirection to the free trial page', async ({testC
         await verifySummaryPageElements(summaryPage);
 
         await summaryPage.clickStartFreeTrial()
-        await expectTextToContain(startTrialPage.startTrialHeader, START_TRIAL_TEXT, 'Start Trial Header');
+        expect(await startTrialPage.getStartTrialHeaderText()).toContain(START_TRIAL_TEXT);
     }
 )
 
 async function verifySummaryPageElements(summaryPage: SummaryPage) {
-    await expectElementToBeVisible(summaryPage.startFreeTrialButton, 'Start Free Trial Button');
-    await expectElementToBeVisible(summaryPage.allAssetsLink, 'All Assets Link');
-    await expectElementToBeVisible(summaryPage.liquidAssetsLink, 'Liquid Assets Link');
-    await expectElementToBeVisible(summaryPage.totalMarketValueText, 'Total Market Value Text');
-    await expectElementToBeVisible(summaryPage.defaultCompareTo, 'Default Compare To');
-    await expectElementToBeVisible(summaryPage.topAssetChanges, 'Top Asset Changes');
-    await expectElementToBeVisible(summaryPage.topAccountChanges, 'Top Account Changes');
-    await expectElementToBeVisible(summaryPage.topBenchmarkChanges, 'Top Benchmark Changes');
-    await expectElementToBeVisible(summaryPage.investmentIncome, 'Investment Income');
-    await expectElementToBeVisible(summaryPage.upcomingEstimatedIncome, 'Upcoming Estimated Income');
+    await expect(summaryPage.startFreeTrialButton).toBeVisible();
+    await expect(summaryPage.allAssetsLink).toBeVisible();
+    await expect(summaryPage.liquidAssetsLink).toBeVisible();
+    await expect(summaryPage.totalMarketValueText).toBeVisible();
+    await expect(summaryPage.defaultCompareTo).toBeVisible();
+    await expect(summaryPage.topAssetChanges).toBeVisible();
+    await expect(summaryPage.topAccountChanges).toBeVisible();
+    await expect(summaryPage.topBenchmarkChanges).toBeVisible();
+    await expect(summaryPage.investmentIncome).toBeVisible();
+    await expect(summaryPage.upcomingEstimatedIncome).toBeVisible();
 }

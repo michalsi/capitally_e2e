@@ -32,7 +32,7 @@ export class PortfolioPage extends BasePage {
 
     addAssetButton: Locator = this.page.getByRole('button', {name: 'Add Asset'});
     assetCombobox: Locator = this.page.getByRole('combobox', {name: "Enter asset's name, SYMBOL or"});
-    addAssetDialog: Locator = this.page.getByText('This is a Demo projectDemo');
+    addAssetDialog: Locator = this.page.getByText('This is a Demo project');
     okButton: Locator = this.page.getByRole('button', {name: 'OK'});
 
     searchBox: Locator = this.page.getByRole('textbox', {name: 'Type here to search the table'});
