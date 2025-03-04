@@ -1,17 +1,15 @@
-import {test} from '../fixtures'
+import {setupTestHooks, test} from '../fixtures'
 import {StartTrialPage} from "../pages/StartTrialPage";
 import {expectElementToBeVisible, expectTextToContain} from "../utils/AssertionHelper";
 import {SummaryPage} from "../pages/SummaryPage";
 
+setupTestHooks();
 
 test('Verify Summary page and redirection to the free trial page', async ({testContext}) => {
         const summaryPage = testContext.summaryPage;
         const startTrialPage = testContext.startTrialPage;
-
         const {START_TRIAL_TEXT} = StartTrialPage;
 
-        await summaryPage.navigate();
-        await summaryPage.acceptCookies();
         await summaryPage.waitForPageLoad()
         await verifySummaryPageElements(summaryPage);
 

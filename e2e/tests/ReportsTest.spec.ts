@@ -1,16 +1,15 @@
-import {test} from "../fixtures";
+import {setupTestHooks, test} from "../fixtures";
 import * as fs from "node:fs";
 import {parse} from 'csv-parse/sync';
 import {ReportValidator} from "../utils/ReportValidator";
 import {CSVRow} from "../models/CSVTypes";
 
+setupTestHooks();
 
 test("Reports Test - verify exporting to CSV file", async ({testContext}) => {
     const summaryPage  = testContext.summaryPage ;
     const reportsPage = testContext.reportsPage;
 
-    await summaryPage.navigate();
-    await summaryPage.acceptCookies();
     await summaryPage.clickReportsMenu();
     await reportsPage.waitForPageLoad();
 

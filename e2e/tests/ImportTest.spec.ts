@@ -1,14 +1,14 @@
-import {test} from "../fixtures";
+import {setupTestHooks, test} from "../fixtures";
 import * as path from 'path';
 import {expectElementToBeVisible, expectTextToContain} from '../utils/AssertionHelper';
+import { testConfig } from "../test-config/test.setup";
+
+setupTestHooks();
 
 test("Import test", async({testContext})=>{
-    const filePath = path.join(__dirname, '../data/mbankTransactions.csv');
+    const filePath = testConfig.testDataPath + 'mBankTransactions.csv';
     const summaryPage = testContext.summaryPage;
     const importPage = testContext.importPage;
-
-    await summaryPage.navigate();
-    await summaryPage.acceptCookies();
 
     await summaryPage.clickImportMenu();
     await importPage.waitForPageLoad();

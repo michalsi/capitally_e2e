@@ -4,7 +4,7 @@ import {StartTrialPage} from "./StartTrialPage";
 import {expectElementToBeVisible} from "../utils/AssertionHelper";
 
 export class SummaryPage extends BasePage {
-    protected getPageLoadSelectors(): Locator[] {
+    getPageLoadSelectors(): Locator[] {
         return [this.welcomeHeading]
     }
     welcomeHeading: Locator = this.page.getByRole('heading', {name: 'Welcome to Capitally Demo 🥳'});

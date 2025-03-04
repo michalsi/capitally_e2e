@@ -2,7 +2,7 @@ import {expect, Locator, Page} from '@playwright/test';
 import {BasePage} from './BasePage';
 
 export class PortfolioPage extends BasePage {
-    protected getPageLoadSelectors(): Locator[] {
+    getPageLoadSelectors(): Locator[] {
         throw new Error('Method not implemented.');
     }
     totalReturnsLink: Locator = this.page.getByRole('link', {name: 'Total Returns'});

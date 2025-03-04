@@ -3,7 +3,7 @@ import {Locator, Page} from "@playwright/test";
 import {TransactionModal} from "./TransactionModal";
 
 export class AssetPage extends BasePage {
-    protected getPageLoadSelectors(): Locator[] {
+    getPageLoadSelectors(): Locator[] {
         throw new Error("Method not implemented.");
     }
 

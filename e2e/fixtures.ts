@@ -40,3 +40,26 @@ export const test = base.extend<{
     },
 
 })
+
+export const setupTestHooks = () => {
+    test.beforeAll(async ({ browser }) => {
+        // Global setup that runs once before all tests
+        console.log('Starting test suite execution');
+        // Setup global test data, configurations, etc.
+    });
+    test.afterAll(async ({ browser }) => {
+        // Cleanup after all tests
+        console.log('Completed test suite execution');
+        // Cleanup global resources
+    });
+    test.beforeEach(async ({ page, testContext }) => {
+        // Setup before each test
+        const summaryPage = testContext.summaryPage;
+
+        await summaryPage.navigate();
+        await summaryPage.acceptCookies();
+    });
+    test.afterEach(async ({ page }, testInfo) => {
+        // Cleanup after each test
+    });
+};

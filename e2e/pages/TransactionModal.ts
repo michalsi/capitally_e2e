@@ -2,7 +2,7 @@ import {Locator, Page} from "@playwright/test";
 import {BasePage} from "./BasePage";
 
 export class TransactionModal extends BasePage {
-    protected getPageLoadSelectors(): Locator[] {
+    getPageLoadSelectors(): Locator[] {
         throw new Error("Method not implemented.");
     }
     buyRadioButton: Locator = this.page.getByRole('radio', {name: 'Buy'});

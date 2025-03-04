@@ -16,7 +16,7 @@ export class ImportPage extends BasePage {
         super(page);
     }
 
-    protected getPageLoadSelectors(): Locator[] {
+    getPageLoadSelectors(): Locator[] {
         return [this.brokerMBank]
     }
 

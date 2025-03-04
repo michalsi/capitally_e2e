@@ -1,10 +1,11 @@
 import {Locator, Page} from '@playwright/test'
 import {IPage} from '../interfaces';
+import {testConfig} from '../test-config/test.setup';
 
 
 export abstract class BasePage implements IPage {
     protected readonly page: Page;
-    protected readonly BASE_URL = 'https://app.mycapitally.com/project';
+    protected readonly BASE_URL = testConfig.baseUrl;
     readonly abstract url: string;
     protected acceptAllButton: Locator;
 

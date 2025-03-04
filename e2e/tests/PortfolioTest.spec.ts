@@ -1,42 +1,46 @@
-import {test} from "../fixtures";
+import {setupTestHooks, test} from "../fixtures";
 import {expect} from "@playwright/test";
 import {expectElementToBeVisible, expectTextToContain} from "../utils/AssertionHelper";
 
-test("Verify Portfolio - adding assets not supported by demo account", async ({testContext}) => {
-        let searchAsset = "tesla";
-        let assetNameToWait = "Tesla Inc Stock · NASDAQ TSLA";
+setupTestHooks();
 
-        const portfolioPage = testContext.portfolioPage;
-        await portfolioPage.navigate()
-        await portfolioPage.acceptCookies()
+test.describe('Portfolio Test', () => {
+        test("Verify Portfolio - adding assets not supported by demo account", async ({testContext}) => {
+                let searchAsset = "tesla";
+                let assetNameToWait = "Tesla Inc Stock · NASDAQ TSLA";
 
-        await portfolioPage.clickThroughAllUpperMenuItems()
-        await portfolioPage.clickThroughAllLowerMenuItems()
+                const portfolioPage = testContext.portfolioPage;
+                await portfolioPage.navigate()
 
-        await portfolioPage.clickPositions()
-        await portfolioPage.addAsset(searchAsset, assetNameToWait)
-        await expectElementToBeVisible(portfolioPage.getAddAssetDemoDialog(), 'Add Asset Demo Dialog');
-        await portfolioPage.closeAddAssetDemoDialog()
-    }
-)
+                await portfolioPage.clickThroughAllUpperMenuItems()
+                await portfolioPage.clickThroughAllLowerMenuItems()
 
-test("Verify Portfolio - adding new transaction", async ({testContext}) => {
-        let positionName = 'Microsoft Corporation';
-        const {assetPage, portfolioPage} = testContext
+                await portfolioPage.clickPositions()
+                await portfolioPage.addAsset(searchAsset, assetNameToWait)
+                await expectElementToBeVisible(portfolioPage.getAddAssetDemoDialog(), 'Add Asset Demo Dialog');
+                await portfolioPage.closeAddAssetDemoDialog()
+            }
+        )
 
-        const timestamp = Date.now();
-        const transactionName: string = `My Transaction @ ${timestamp}`;
-        const transactionAmount: number = 1
+        test("Verify Portfolio - adding new transaction", async ({testContext}) => {
+                let positionName = 'Microsoft Corporation';
+                const {assetPage, portfolioPage} = testContext
 
-        await portfolioPage.navigate()
-        await portfolioPage.acceptCookies()
+                const timestamp = Date.now();
+                const transactionName: string = `My Transaction @ ${timestamp}`;
+                const transactionAmount: number = 1
 
-        await portfolioPage.openPositionDetails(positionName)
-        await assetPage.performBuyTransaction(transactionAmount, transactionName)
-        await assetPage.clickTransactionsTab()
-        await assetPage.openBuyTransaction()
+                await portfolioPage.navigate()
+                await portfolioPage.acceptCookies()
 
-        await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
-        await expectTextToContain(assetPage.getTransactionNotes(), transactionName, 'Transaction Notes');
+                await portfolioPage.openPositionDetails(positionName)
+                await assetPage.performBuyTransaction(transactionAmount, transactionName)
+                await assetPage.clickTransactionsTab()
+                await assetPage.openBuyTransaction()
+
+                await expect(assetPage.getTransactionQuantity()).toHaveValue(transactionAmount.toString());
+                await expectTextToContain(assetPage.getTransactionNotes(), transactionName, 'Transaction Notes');
+            }
+        )
     }
 )
