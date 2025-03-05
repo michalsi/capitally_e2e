@@ -5,7 +5,7 @@ import {expect} from "@playwright/test";
 setupTestHooks();
 
 test("Import test", async({testContext})=>{
-    const filePath = testConfig.testDataPath + 'mBankTransactions.csv';
+    const filePath = testConfig.testDataPath + 'mbankTransactions.csv';
     const summaryPage = testContext.summaryPage;
     const importPage = testContext.importPage;
 
